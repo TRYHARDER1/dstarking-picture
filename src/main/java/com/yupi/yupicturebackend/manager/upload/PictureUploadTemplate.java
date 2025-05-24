@@ -64,7 +64,7 @@ public abstract class PictureUploadTemplate {
                     thumbnailCiObject = objectList.get(1);
                 }
 
-                return buildResult(originFilename, compressedCiObject, thumbnailCiObject);
+                return buildResult(originFilename, compressedCiObject, thumbnailCiObject, imageInfo);
             }
             // 5. 封装返回结果
             return buildResult(originFilename, file, uploadPath, imageInfo);
@@ -77,21 +77,25 @@ public abstract class PictureUploadTemplate {
         }
     }
 
-    private UploadPictureResult buildResult(String originFilename, CIObject compressedCiObject, CIObject thumbnailCiObject) {
+    private UploadPictureResult buildResult(String originFilename, CIObject compressedCiObject, CIObject thumbnailCiObject, ImageInfo imageInfo) {
         UploadPictureResult uploadPictureResult = new UploadPictureResult();
-        Integer picWidth = compressedCiObject.getWidth();
-        Integer picHeight = compressedCiObject.getHeight();
+        int picWidth = compressedCiObject.getWidth();
+        int picHeight = compressedCiObject.getHeight();
         double picScale = NumberUtil.round(picWidth * 1.0 / picHeight, 2).doubleValue();
         uploadPictureResult.setPicName(FileUtil.mainName(originFilename));
         uploadPictureResult.setPicWidth(picWidth);
         uploadPictureResult.setPicHeight(picHeight);
         uploadPictureResult.setPicScale(picScale);
         uploadPictureResult.setPicFormat(compressedCiObject.getFormat());
+        uploadPictureResult.setPicColor(imageInfo.getAve());
         uploadPictureResult.setPicSize(compressedCiObject.getSize().longValue());
+        // 设置图片为压缩后的地址
         uploadPictureResult.setUrl(cosClientConfig.getHost() + "/" + compressedCiObject.getKey());
+        // 设置缩略图
         uploadPictureResult.setThumbnailUrl(cosClientConfig.getHost() + "/" + thumbnailCiObject.getKey());
         return uploadPictureResult;
     }
+
 
     /**
      * 校验输入源（本地文件或 URL）
@@ -123,6 +127,7 @@ public abstract class PictureUploadTemplate {
         uploadPictureResult.setPicFormat(imageInfo.getFormat());
         uploadPictureResult.setPicSize(FileUtil.size(file));
         uploadPictureResult.setUrl(cosClientConfig.getHost() + "/" + uploadPath);
+        uploadPictureResult.setPicColor(imageInfo.getAve());
         return uploadPictureResult;
     }
 

@@ -71,6 +71,11 @@ public class UrlPictureUpload extends PictureUploadTemplate {
     @Override
     protected String getOriginFilename(Object inputSource) {
         String fileUrl = (String) inputSource;
+        if (fileUrl.contains("result-") && fileUrl.contains("?OSSAccessKeyId")){
+            int start = fileUrl.indexOf("result-");
+            int end = fileUrl.indexOf("?OSSAccessKeyId");
+            return fileUrl.substring(start, end);
+        }
         URL url = null;
         try{
             url = new URL(fileUrl);
